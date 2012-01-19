@@ -21,13 +21,14 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "gui.h"
 
 
-Gui::Gui(QWidget* parent, QSettings* settings) 
+Gui::Gui(QWidget* parent, QSettings* settings, SessionManager* sessionManager) 
 : QWidget(parent)
 {
 	if (settings == NULL)
 		return;	
 
 	this->settings = settings;
+	this->sessionManager = sessionManager;
 
 	// Group box for Commands
 	QGroupBox *commandsBox = new QGroupBox(tr("Commands"), this);
@@ -49,17 +50,18 @@ Gui::Gui(QWidget* parent, QSettings* settings)
 	QGroupBox *searchBox = new QGroupBox(tr("Search"), this);
 	searchBox->setGeometry(12, 110, 460, 100);
 		// Allow indexing of sessions in main Launchy search.
-		allowSessionIndexingSelect = new QCheckBox(tr("Allow SecureCRT sessions to be indexed within Launchy catalog."), this);
-		allowSessionIndexingSelect->setGeometry(25, 135, 400, 20);
-		allowSessionIndexingSelect->setChecked(settings->value("secureCRT/allowSessionIndexing", true).toBool());
+			allowSessionIndexingSelect = new QCheckBox(tr("Allow SecureCRT sessions to be indexed within Launchy catalog."), this);
+			allowSessionIndexingSelect->setGeometry(25, 135, 400, 20);
+			allowSessionIndexingSelect->setChecked(settings->value("secureCRT/allowSessionIndexing", true).toBool());
 		// Label
-		QLabel *sessionsLocationLabel = new QLabel(tr("Location of SecureCRT sessions folder:"), this);
-		sessionsLocationLabel->setGeometry(25, 155, 400, 20);
+			QLabel *sessionsLocationLabel = new QLabel(tr("Location of SecureCRT sessions folder:"), this);
+			sessionsLocationLabel->setGeometry(25, 155, 400, 20);
 		// Text box with location of SecureCRT Sessions
-		QString loc = settings->value("secureCRT/sessionsLocation", "test").toString();
-		sessionsFolderLocationText = new QLineEdit(loc, this);
-		sessionsFolderLocationText->setGeometry(45, 175, 420, 20);
-		sessionsFolderLocationText->setEchoMode(QLineEdit::Normal);
+			QString loc = sessionManager->getDefaultLocation();
+			loc = settings->value("secureCRT/sessionsLocation", loc).toString();
+			sessionsFolderLocationText = new QLineEdit(loc, this);
+			sessionsFolderLocationText->setGeometry(45, 175, 420, 20);
+			sessionsFolderLocationText->setEchoMode(QLineEdit::Normal);
 
 	/**
 	QLineEdit *sessionsLocLineEdit = new QLineEdit(tr("text"), this);
@@ -79,6 +81,8 @@ void Gui::writeOptions()
 	settings->setValue("secureCRT/sshCommand", sshSelect->isChecked());
 	settings->setValue("secureCRT/secureCrtCommand", secureCrtSelect->isChecked());
 	settings->setValue("secureCRT/allowSessionIndexing", allowSessionIndexingSelect->isChecked());
+	if (sessionManager->setSessionPath(sessionsFolderLocationText->text()))		
+		settings->setValue("secureCRT/sessionsLocation", sessionsFolderLocationText->text());	
 }
 
 Gui::~Gui()

@@ -55,6 +55,7 @@ void launchy_crtPlugin::init()
 	sshCmdSet = set->value("secureCRT/sshCommand", true).toBool();
 	secCmdSet = set->value("secureCRT/secureCrtCommand", true).toBool();
 	allowIndexing = set->value("secureCRT/allowSessionIndexing", true).toBool();
+	sessionManager.setSessionPath(set->value("secureCRT/sessionsLocation", sessionManager.getDefaultLocation()).toString());
 }
 
 
@@ -215,7 +216,7 @@ void launchy_crtPlugin::doDialog(QWidget* parent, QWidget** newDlg)
 	if (gui != NULL){
 		return;
 	}
-	gui = new Gui(parent, *settings);
+	gui = new Gui(parent, *settings, &sessionManager);
 	*newDlg = gui;
 }
 

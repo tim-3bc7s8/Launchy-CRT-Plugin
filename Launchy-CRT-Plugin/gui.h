@@ -23,18 +23,20 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "globals.h"
 #include <QSettings>
 #include <QtGui>
+#include "SessionManager.h"
 
 class Gui : public QWidget
 {
 	Q_OBJECT
 
 public:
-	Gui(QWidget* parent, QSettings* settings);
+	Gui(QWidget* parent, QSettings* settings, SessionManager* sessionManager);
 	~Gui();
 	void writeOptions();
 
 private:
 	QSettings *settings;
+	SessionManager* sessionManager;
 	QCheckBox *telnetSelect;
 	QCheckBox *sshSelect;
 	QCheckBox *secureCrtSelect;
