@@ -63,14 +63,19 @@ Gui::Gui(QWidget* parent, QSettings* settings, SessionManager* sessionManager)
 			sessionsFolderLocationText->setGeometry(45, 175, 420, 20);
 			sessionsFolderLocationText->setEchoMode(QLineEdit::Normal);
 
-	/**
-	QLineEdit *sessionsLocLineEdit = new QLineEdit(tr("text"), this);
-	sessionsLocLineEdit->setGeometry(100, 100, 200, 25);
-	
-	QPushButton *submitBtn = new QPushButton(tr("Submit"), this);
-	submitBtn->setGeometry(200, 125, 125, 30);
-	submitBtn->setFont(QFont("Arial", 12));
-	**/
+	// Group box for Info
+	QGroupBox *infoBox = new QGroupBox(tr("About"), this);
+	infoBox->setGeometry(12, 340, 460, 50);		
+		// Displays a link to homepage
+			QString link = "<a href=\"https://github.com/timmy0020/Launchy-CRT-Plugin\">https://github.com/timmy0020/Launchy-CRT-Plugin</a>";
+			QLabel *linkToSite = new QLabel(link, this);
+			linkToSite->setOpenExternalLinks(true);
+			linkToSite->setGeometry(25, 360, 400, 20);
+		// Displays the version of the plugin
+			QString version = "Version: ";
+			version.append(settings->value("secureCRT/version").toString());
+			QLabel *versionNumber = new QLabel(version, this);
+			versionNumber->setGeometry(400, 360, 400, 20);
 }
 
 void Gui::writeOptions()

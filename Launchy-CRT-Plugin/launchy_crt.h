@@ -19,6 +19,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #pragma once
 
 #define PLUGIN_NAME "Launchy-CRT"
+#define PLUGIN_VERSION "0.2"
 
 #include "plugin_interface.h"
 #include "SessionManager.h"
@@ -34,7 +35,7 @@ class launchy_crtPlugin : public QObject, public PluginInterface
 public:
 	uint HASH_secureCRT;
 	uint HASH_session;
-private:
+private: 
 	SessionManager sessionManager;
 	Gui* gui;
 	// settings

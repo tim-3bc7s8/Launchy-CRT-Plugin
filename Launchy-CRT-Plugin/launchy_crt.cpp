@@ -51,6 +51,7 @@ void launchy_crtPlugin::init()
 {
 	SessionManager sessionManager;
 	QSettings* set = *settings;
+	set->setValue("secureCRT/version", PLUGIN_VERSION); 
 	telCmdSet = set->value("secureCRT/telnetCommand", true).toBool();
 	sshCmdSet = set->value("secureCRT/sshCommand", true).toBool();
 	secCmdSet = set->value("secureCRT/secureCrtCommand", true).toBool();
