@@ -49,7 +49,7 @@ void launchy_crtPlugin::getName(QString* str)
 
 void launchy_crtPlugin::init()
 {
-	SessionManager sessionManager;
+	sessionManager;
 	QSettings* set = *settings;
 	set->setValue("secureCRT/version", PLUGIN_VERSION); 
 	telCmdSet = set->value("secureCRT/telnetCommand", true).toBool();
@@ -89,7 +89,7 @@ void launchy_crtPlugin::getResults(QList<InputData>* id, QList<CatItem>* results
 					sessionName = session;
 				}
 				// display results
-				results->push_front(CatItem(session, sessionName, HASH_secureCRT, getIcon()));				
+				results->push_back(CatItem(session, sessionName, HASH_secureCRT, getIcon()));				
 			}
 		}	
 	}
