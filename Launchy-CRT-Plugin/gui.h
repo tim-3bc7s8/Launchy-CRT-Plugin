@@ -42,6 +42,18 @@ private:
 	QCheckBox *secureCrtSelect;
 	QCheckBox *allowSessionIndexingSelect;
 	QLineEdit *sessionsFolderLocationText;
+	QPushButton *openFileDialog;
+
+public slots:
+	void clickedFileDialog()
+	{
+		QString filePath = QFileDialog::getExistingDirectory(this, 
+															 tr("Directory Path"),
+															 "C:", 
+															 QFileDialog::ShowDirsOnly);
+		if (!filePath.isEmpty())
+			sessionsFolderLocationText->setText(filePath);
+	}
 };
 
 

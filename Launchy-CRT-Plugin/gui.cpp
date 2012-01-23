@@ -60,8 +60,12 @@ Gui::Gui(QWidget* parent, QSettings* settings, SessionManager* sessionManager)
 			QString loc = sessionManager->getDefaultLocation();
 			loc = settings->value("secureCRT/sessionsLocation", loc).toString();
 			sessionsFolderLocationText = new QLineEdit(loc, this);
-			sessionsFolderLocationText->setGeometry(45, 175, 420, 20);
+			sessionsFolderLocationText->setGeometry(45, 175, 390, 20);
 			sessionsFolderLocationText->setEchoMode(QLineEdit::Normal);
+		// Push button to open FileDialog
+			openFileDialog = new QPushButton(tr("..."), this);
+			openFileDialog->setGeometry(440, 175, 25, 20);
+			QObject::connect(openFileDialog, SIGNAL(clicked()), this, SLOT(clickedFileDialog()));
 
 	// Group box for Info
 	QGroupBox *infoBox = new QGroupBox(tr("About"), this);
