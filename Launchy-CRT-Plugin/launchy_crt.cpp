@@ -57,9 +57,13 @@ void launchy_crtPlugin::init()
 	allowIndexing = set->value("secureCRT/allowSessionIndexing", true).toBool();
 	sessionManager.setSessionPath(set->value("secureCRT/sessionsLocation", sessionManager.getDefaultLocation()).toString());
 	// loads the sessions into the catalog. otherwise, the <tab> function
-	// won't work until the library is refreshed.
-	if (sessionManager.getSessionList().isEmpty())
+	// won't show any sessions until the library is refreshed.
+	if (secCmdSet && sessionManager.getSessionList().isEmpty())
 		sessionManager.setSessionList(buildCatalog());
+	// load keywords
+	telnetKeyword = set->value("secureCRT/telnetKeyword", "Telnet").toString();
+	sshKeyword = set->value("secureCRT/sshKeyword", "SSH").toString();
+	secureCrtKeyword = set->value("secureCRT/secureCrtKeyword", "SecureCRT").toString();
 }
 
 
@@ -77,7 +81,7 @@ void launchy_crtPlugin::getResults(QList<InputData>* id, QList<CatItem>* results
 		return;
 
 	// This section handles the SecureCRT <tab> feature
-	if (id->count() >= 2 && secCmdSet && id->first().getText() == "SecureCRT") {		
+	if (id->count() >= 2 && secCmdSet && id->first().getText() == secureCrtKeyword) {		
 		// Get a list of all the sessions available
 		QList<CatItem> sessions = sessionManager.getSessionList();
 		foreach (CatItem session, sessions) {
@@ -89,13 +93,13 @@ void launchy_crtPlugin::getResults(QList<InputData>* id, QList<CatItem>* results
 	}
 
 	// This section handles the telnet <tab> feature
-	if (id->count() == 2 && telCmdSet && id->first().getText() == "Telnet") {
+	if (id->count() == 2 && telCmdSet && id->first().getText() == telnetKeyword) {
 		QString text = id->last().getText();
 		results->push_front(CatItem("SecureCRT Telnet", text, HASH_secureCRT, getIcon()));
 	}
 
 	// This section handles the ssh <tab> feature
-	if (id->count() == 2 && sshCmdSet && id->first().getText() == "SSH") {
+	if (id->count() == 2 && sshCmdSet && id->first().getText() == sshKeyword) {
 		QString text = id->last().getText();
 		results->push_front(CatItem("SecureCRT SSH", text, HASH_secureCRT, getIcon()));
 	}
@@ -126,17 +130,17 @@ void launchy_crtPlugin::getCatalog(QList<CatItem>* items)
 {
 	// This is used for the SecureCRT <tab> feature
 	if (secCmdSet) {
-		items->push_back(CatItem("SecureCRT", "SecureCRT", HASH_secureCRT, getIcon()));
+		items->push_back(CatItem("SecureCRT", secureCrtKeyword, HASH_secureCRT, getIcon()));
 	}
 
 	// This is the telnet feature
 	if (telCmdSet) {
-		items->push_back(CatItem("SecureCRT Telnet", "Telnet", HASH_secureCRT, getIcon()));
+		items->push_back(CatItem("SecureCRT Telnet", telnetKeyword, HASH_secureCRT, getIcon()));
 	}
 
 	// This is the ssh feature
 	if (sshCmdSet) {
-		items->push_back(CatItem("SecureCRT SSH", "SSH", HASH_secureCRT, getIcon()));
+		items->push_back(CatItem("SecureCRT SSH", sshKeyword, HASH_secureCRT, getIcon()));
 	}
 
 	// Build a list of sessions
@@ -161,7 +165,7 @@ void launchy_crtPlugin::launchItem(QList<InputData>* id, CatItem* item)
 	item = &id->last().getTopResult();
 
 	if (id->count() == 1) {		
-		if (item->shortName == "SecureCRT") {
+		if (item->shortName == secureCrtKeyword) {
 			// Run SecureCRT without any arguments
 			runProgram(program, "");
 		} else {
@@ -173,7 +177,7 @@ void launchy_crtPlugin::launchItem(QList<InputData>* id, CatItem* item)
 
 	// these are <tab> features
 	if (id->count() == 2) {
-		if (secCmdSet && id->first().getText() == "SecureCRT") {
+		if (secCmdSet && id->first().getText() == secureCrtKeyword) {
 			// Run a SecureCRT session
 			QString args = "/T /S \"" + item->fullPath + "\"";
 			runProgram(program, args); 
@@ -182,12 +186,12 @@ void launchy_crtPlugin::launchItem(QList<InputData>* id, CatItem* item)
 			tempList[i].usage++;
 			sessionManager.setSessionList(tempList);
 		}
-		else if (telCmdSet && id->first().getText() == "Telnet") {
+		else if (telCmdSet && id->first().getText() == telnetKeyword) {
 			// Run a telnet session
 			QString args = "/T /TELNET " + item->shortName;
 			runProgram(program, args);
 		}
-		else if (sshCmdSet && id->first().getText() == "SSH") {
+		else if (sshCmdSet && id->first().getText() == sshKeyword) {
 			// Run a SSH session
 			QString args = "/T /SSH2 " + item->shortName;
 			runProgram(program, args);
@@ -196,7 +200,7 @@ void launchy_crtPlugin::launchItem(QList<InputData>* id, CatItem* item)
 	
 	// opening more than one session
 	if (id->count() > 2) {
-		if (secCmdSet && id->first().getText() == "SecureCRT") {
+		if (secCmdSet && id->first().getText() == secureCrtKeyword) {
 			QString args = "/T ";
 			for (int i = 1; i < id->count(); i++) {
 				item = &(*id)[i].getTopResult();

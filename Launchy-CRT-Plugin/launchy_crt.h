@@ -45,6 +45,10 @@ private:
 	bool secCmdSet;
 	bool allowIndexing;
 	QList<CatItem> buildCatalog();
+	// keywords
+	QString telnetKeyword;
+	QString sshKeyword;
+	QString secureCrtKeyword;
 
 public:
 	launchy_crtPlugin() {

@@ -34,17 +34,34 @@ Gui::Gui(QWidget* parent, QSettings* settings, SessionManager* sessionManager)
 	QGroupBox *commandsBox = new QGroupBox(tr("Commands"), this);
 	commandsBox->setGeometry(12, 5, 460, 100);	
 		// Telnet Checkbox. This turns the telnet command on/off
-			telnetSelect = new QCheckBox(tr("telnet - Use this command with <tab> /address/ to telnet to a device."), this);
+			telnetSelect = new QCheckBox(tr("telnet - <tab> /address/ to telnet to a device."), this);
 			telnetSelect->setGeometry(25, 30, 400, 20);
 			telnetSelect->setChecked(settings->value("secureCRT/telnetCommand", true).toBool());
 		// SSH Checkbox. Turns ssh command on/off
-			sshSelect = new QCheckBox(tr("ssh - Use this command with <tab> /address/ to ssh to a device."), this);
+			sshSelect = new QCheckBox(tr("ssh - <tab> /address/ to ssh to a device."), this);
 			sshSelect->setGeometry(25, 50, 400, 20);
 			sshSelect->setChecked(settings->value("secureCRT/sshCommand", true).toBool());
 		// SecureCRT Checkbox. Turns searchable sessions on/off
-			secureCrtSelect = new QCheckBox(tr("SecureCRT - Allows using <tab> to search through SecureCRT sessions."), this);
+			secureCrtSelect = new QCheckBox(tr("SecureCRT - Allows searching SecureCRT sessions."), this);
 			secureCrtSelect->setGeometry(25, 70, 400, 20);
 			secureCrtSelect->setChecked(settings->value("secureCRT/secureCrtCommand", true).toBool());
+	// Keyword Options
+		// load keywords
+			QString telnetKeyword = settings->value("secureCRT/telnetKeyword", "Telnet").toString();
+			QString sshKeyword = settings->value("secureCRT/sshKeyword", "SSH").toString();
+			QString secureCrtKeyword = settings->value("secureCRT/secureCrtKeyword", "SecureCRT").toString();
+		// Alternate keyword label
+			QLabel *keywordLabel = new QLabel(tr("Keywords"), this);
+			keywordLabel->setGeometry(390, 10, 70, 20);
+		// Textbox for telnet keyword
+			telnetKeywordEdit = new QLineEdit(telnetKeyword, this);
+			telnetKeywordEdit->setGeometry(370, 30, 90, 18);
+		// Textbox for ssh keyword
+			sshKeywordEdit = new QLineEdit(sshKeyword, this);
+			sshKeywordEdit->setGeometry(370, 50, 90, 18);
+		// Textbox for SecureCRT keyword
+			secureCrtKeywordEdit = new QLineEdit(secureCrtKeyword, this);
+			secureCrtKeywordEdit->setGeometry(370, 70, 90, 18);
 	
 	// Group box for Search 
 	QGroupBox *searchBox = new QGroupBox(tr("Search"), this);
@@ -92,6 +109,12 @@ void Gui::writeOptions()
 	settings->setValue("secureCRT/allowSessionIndexing", allowSessionIndexingSelect->isChecked());
 	if (sessionManager->setSessionPath(sessionsFolderLocationText->text()))		
 		settings->setValue("secureCRT/sessionsLocation", sessionsFolderLocationText->text());	
+	if (!telnetKeywordEdit->text().isEmpty())
+		settings->setValue("secureCRT/telnetKeyword", telnetKeywordEdit->text());
+	if (!sshKeywordEdit->text().isEmpty())
+		settings->setValue("secureCRT/sshKeyword", sshKeywordEdit->text());
+	if (!secureCrtKeywordEdit->text().isEmpty())
+		settings->setValue("secureCRT/secureCrtKeyword", secureCrtKeywordEdit->text());
 }
 
 Gui::~Gui()

@@ -43,6 +43,9 @@ private:
 	QCheckBox *allowSessionIndexingSelect;
 	QLineEdit *sessionsFolderLocationText;
 	QPushButton *openFileDialog;
+	QLineEdit *telnetKeywordEdit;
+	QLineEdit *sshKeywordEdit;
+	QLineEdit *secureCrtKeywordEdit;
 
 public slots:
 	void clickedFileDialog()
