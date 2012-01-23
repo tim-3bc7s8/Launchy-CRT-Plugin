@@ -49,7 +49,6 @@ void launchy_crtPlugin::getName(QString* str)
 
 void launchy_crtPlugin::init()
 {
-	sessionManager;
 	QSettings* set = *settings;
 	set->setValue("secureCRT/version", PLUGIN_VERSION); 
 	telCmdSet = set->value("secureCRT/telnetCommand", true).toBool();
@@ -57,6 +56,10 @@ void launchy_crtPlugin::init()
 	secCmdSet = set->value("secureCRT/secureCrtCommand", true).toBool();
 	allowIndexing = set->value("secureCRT/allowSessionIndexing", true).toBool();
 	sessionManager.setSessionPath(set->value("secureCRT/sessionsLocation", sessionManager.getDefaultLocation()).toString());
+	// loads the sessions into the catalog. otherwise, the <tab> function
+	// won't work until the library is refreshed.
+	if (sessionManager.getSessionList().isEmpty())
+		sessionManager.setSessionList(buildCatalog());
 }
 
 
@@ -74,14 +77,13 @@ void launchy_crtPlugin::getResults(QList<InputData>* id, QList<CatItem>* results
 		return;
 
 	// This section handles the SecureCRT <tab> feature
-	if (id->count() >= 2 && secCmdSet && id->first().getText() == "SecureCRT") {	
-		
+	if (id->count() >= 2 && secCmdSet && id->first().getText() == "SecureCRT") {		
 		// Get a list of all the sessions available
 		QList<CatItem> sessions = sessionManager.getSessionList();
 		foreach (CatItem session, sessions) {
 			if (matchUserInput(session, id->last().getText())) {				
 				// display results
-				results->push_front(session);
+				results->push_back(session);  
 			}
 		}
 	}
@@ -139,19 +141,7 @@ void launchy_crtPlugin::getCatalog(QList<CatItem>* items)
 
 	// Build a list of sessions
 	if (allowIndexing || secCmdSet) {
-		QList<CatItem> sessionList;
-		QStringList sessionNames = sessionManager.getSessions();
-		foreach (QString session, sessionNames) {
-			// if session contains a filepath, remove the filepath from the name
-			QString sessionName;
-			if (session.contains("/")) {
-				QStringList filePath = session.split("/");
-				sessionName = filePath[filePath.count()-1];
-			} else {
-				sessionName = session;
-			}
-			sessionList.push_back(CatItem(session, sessionName, HASH_secureCRT, getIcon()));
-		}
+		QList<CatItem> sessionList = buildCatalog();		
 		// Adds sessions info Launchy's catalog
 		if (allowIndexing) {
 			foreach (CatItem s, sessionList) {
@@ -187,6 +177,10 @@ void launchy_crtPlugin::launchItem(QList<InputData>* id, CatItem* item)
 			// Run a SecureCRT session
 			QString args = "/T /S \"" + item->fullPath + "\"";
 			runProgram(program, args); 
+			QList<CatItem> tempList = sessionManager.getSessionList();
+			int i = tempList.indexOf(*item);
+			tempList[i].usage++;
+			sessionManager.setSessionList(tempList);
 		}
 		else if (telCmdSet && id->first().getText() == "Telnet") {
 			// Run a telnet session
@@ -208,9 +202,6 @@ void launchy_crtPlugin::launchItem(QList<InputData>* id, CatItem* item)
 				item = &(*id)[i].getTopResult();
 				args.append("/S \"" + item->fullPath + "\"");
 			}
-			QMessageBox msgBox;
-			msgBox.setText(args);
-			msgBox.exec();
 		}
 	}
 }
@@ -234,6 +225,24 @@ void launchy_crtPlugin::endDialog(bool accept)
 		delete gui;
 	}
 	gui = NULL;
+}
+
+QList<CatItem> launchy_crtPlugin::buildCatalog()
+{
+	QList<CatItem> sessionList;
+	QStringList sessionNames = sessionManager.getSessions();
+	foreach (QString session, sessionNames) {
+		// if session contains a filepath, remove the filepath from the name
+		QString sessionName;
+		if (session.contains("/")) {
+			QStringList filePath = session.split("/");
+			sessionName = filePath[filePath.count()-1];
+		} else {
+			sessionName = session;
+		}
+		sessionList.push_back(CatItem(session, sessionName, HASH_secureCRT, getIcon()));
+	}
+	return sessionList;
 }
 
 int launchy_crtPlugin::msg(int msgId, void* wParam, void* lParam)

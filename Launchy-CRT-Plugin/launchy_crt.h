@@ -44,6 +44,7 @@ private:
 	bool sshCmdSet;
 	bool secCmdSet;
 	bool allowIndexing;
+	QList<CatItem> buildCatalog();
 
 public:
 	launchy_crtPlugin() {

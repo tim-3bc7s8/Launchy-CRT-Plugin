@@ -38,6 +38,17 @@ bool CatLessNoPtr(CatItem & a, CatItem & b)
 
 bool CatLess(CatItem* a, CatItem* b)
 {
+	QMessageBox msg;
+	msg.setText("Here");
+	msg.exec();
+
+	if (a->lowName <= a->lowName) {
+		return true;
+	} else {
+		return false; }
+
+	
+
 	// Items with negative usage are lowest priority
 	if (a->usage < 0 && b->usage >= 0)
 		return false;
