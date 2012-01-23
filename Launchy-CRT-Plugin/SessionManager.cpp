@@ -55,3 +55,14 @@ bool SessionManager::setSessionPath(QString selectedLocation)
 	sessionFolder = selectedLocation;
 	return true;
 }
+
+QList<CatItem> SessionManager::getSessionList()
+{
+	return this->sessionList;
+}
+
+
+void SessionManager::setSessionList(QList<CatItem> sessions)
+{
+	this->sessionList = sessions;
+}

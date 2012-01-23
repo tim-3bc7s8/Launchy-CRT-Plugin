@@ -77,21 +77,13 @@ void launchy_crtPlugin::getResults(QList<InputData>* id, QList<CatItem>* results
 	if (id->count() >= 2 && secCmdSet && id->first().getText() == "SecureCRT") {	
 		
 		// Get a list of all the sessions available
-		QStringList sessions = sessionManager.getSessions();		
-		foreach (QString session, sessions) {
-			if (matchUserInput(session, id->last().getText())) {			
-				// if session contains a filepath, remove the filepath from the name
-				QString sessionName;
-				if (session.contains("/")) {
-					QStringList filePath = session.split("/");
-					sessionName = filePath[filePath.count()-1];
-				} else {
-					sessionName = session;
-				}
+		QList<CatItem> sessions = sessionManager.getSessionList();
+		foreach (CatItem session, sessions) {
+			if (matchUserInput(session, id->last().getText())) {				
 				// display results
-				results->push_back(CatItem(session, sessionName, HASH_secureCRT, getIcon()));				
+				results->push_front(session);
 			}
-		}	
+		}
 	}
 
 	// This section handles the telnet <tab> feature
@@ -108,14 +100,14 @@ void launchy_crtPlugin::getResults(QList<InputData>* id, QList<CatItem>* results
 }
 
 // Compares the session with the user input
-bool launchy_crtPlugin::matchUserInput(QString session, QString userInput) {
+bool launchy_crtPlugin::matchUserInput(CatItem session, QString userInput) {
 	if (userInput.trimmed().isEmpty())
 		return true;
 
 	QStringList userInputList;
 	userInputList = userInput.split(" ");
 	foreach (QString text, userInputList) {
-		if (!session.contains(text,Qt::CaseInsensitive))
+		if (!session.fullPath.contains(text,Qt::CaseInsensitive))
 			return false;
 	}
 	return true;
@@ -145,10 +137,11 @@ void launchy_crtPlugin::getCatalog(QList<CatItem>* items)
 		items->push_back(CatItem("SecureCRT SSH", "SSH", HASH_secureCRT, getIcon()));
 	}
 
-	// This builds all of the sessions into the catalog
-	if (allowIndexing) {
-		QStringList sessions = sessionManager.getSessions();		
-		foreach (QString session, sessions) {
+	// Build a list of sessions
+	if (allowIndexing || secCmdSet) {
+		QList<CatItem> sessionList;
+		QStringList sessionNames = sessionManager.getSessions();
+		foreach (QString session, sessionNames) {
 			// if session contains a filepath, remove the filepath from the name
 			QString sessionName;
 			if (session.contains("/")) {
@@ -157,9 +150,19 @@ void launchy_crtPlugin::getCatalog(QList<CatItem>* items)
 			} else {
 				sessionName = session;
 			}
-			items->push_back(CatItem(session, sessionName, HASH_secureCRT, getIcon()));
+			sessionList.push_back(CatItem(session, sessionName, HASH_secureCRT, getIcon()));
 		}
-	}
+		// Adds sessions info Launchy's catalog
+		if (allowIndexing) {
+			foreach (CatItem s, sessionList) {
+				items->push_back(s);
+			}
+		}
+		// Adds sessions to the session manager
+		if (secCmdSet) {
+			sessionManager.setSessionList(sessionList);
+		}
+	}	
 }
 
 void launchy_crtPlugin::launchItem(QList<InputData>* id, CatItem* item)
@@ -183,7 +186,7 @@ void launchy_crtPlugin::launchItem(QList<InputData>* id, CatItem* item)
 		if (secCmdSet && id->first().getText() == "SecureCRT") {
 			// Run a SecureCRT session
 			QString args = "/T /S \"" + item->fullPath + "\"";
-			runProgram(program, args);
+			runProgram(program, args); 
 		}
 		else if (telCmdSet && id->first().getText() == "Telnet") {
 			// Run a telnet session
@@ -287,3 +290,4 @@ int launchy_crtPlugin::msg(int msgId, void* wParam, void* lParam)
 
 
 Q_EXPORT_PLUGIN2(myplugin, launchy_crtPlugin) 
+

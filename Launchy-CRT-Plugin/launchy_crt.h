@@ -26,6 +26,7 @@ Foundation, Inc., 59 Temple Place - Suite 330, Boston, MA  02111-1307, USA.
 #include "gui.h"
 
 
+
 class launchy_crtPlugin : public QObject, public PluginInterface
 {
 	Q_OBJECT
@@ -57,7 +58,7 @@ public:
 	void getID(uint*);
 	void getName(QString*);
 	void getResults(QList<InputData>* id, QList<CatItem>* results);
-	bool matchUserInput(QString session, QString userInput);
+	bool matchUserInput(CatItem session, QString userInput);
 	void getCatalog(QList<CatItem>* items);
 	void launchItem(QList<InputData>*, CatItem*);
 	void doDialog(QWidget* parent, QWidget**);
@@ -67,3 +68,6 @@ public:
 };
 
 extern launchy_crtPlugin* gmypluginInstance;
+
+
+

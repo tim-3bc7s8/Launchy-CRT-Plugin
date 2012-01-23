@@ -99,6 +99,14 @@
 			Name="Plugin API"
 			>
 			<File
+				RelativePath=".\catalog.cpp"
+				>
+			</File>
+			<File
+				RelativePath=".\catalog.h"
+				>
+			</File>
+			<File
 				RelativePath=".\plugin_interface.cpp"
 				>
 			</File>
